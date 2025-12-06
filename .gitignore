@@ -1,0 +1,45 @@
+#
+# General Zephyr Project Ignores
+#
+
+# Zephyr build directory (usually where 'west build' or 'cmake' output goes)
+# This is the most important exclusion.
+**/build/
+
+# Zephyr's configuration/Kconfig intermediate files
+# These are generated during the build process
+*.config
+*.h
+*.cmd
+.cmake/
+.cache/
+
+# CMake related files generated during the build
+# CmakeLists.txt files should NOT be ignored.
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Dependency management and virtual environment
+# west dependencies are typically stored in the 'zephyr' directory if not using a
+# manifest file, but we explicitly ignore Python environments.
+.venv/
+venv/
+env/
+
+# Editor/OS specific files (general good practice)
+# VS Code
+.vscode/
+
+# IDE files
+*.iws
+*.iml
+*.ipr
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

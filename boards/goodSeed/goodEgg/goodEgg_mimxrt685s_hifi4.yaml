@@ -1,0 +1,26 @@
+#
+# Copyright 2024 NXP
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+identifier: goodEgg/mimxrt685s/hifi4
+name: GoodSeed goodEgg (HiFi 4)
+type: mcu
+arch: xtensa
+ram: 64
+flash: 64
+toolchain:
+  - zephyr
+  - xt-clang
+  - xtools
+supported:
+  - dma
+  - gpio
+  - i2c
+  - i3c
+  - i2s
+  - spi
+testing:
+  only_tags:
+    - kernel

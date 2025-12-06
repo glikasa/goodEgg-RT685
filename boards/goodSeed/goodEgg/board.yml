@@ -1,0 +1,6 @@
+board:
+  name: goodEgg 
+  full_name: goodEgg 
+  vendor: goodSeed
+  socs:
+    - name: mimxrt685s
