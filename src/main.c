@@ -20,7 +20,7 @@ static const struct device *adc = DEVICE_DT_GET(ADC_NODE);
 
 
 /* Common initialization for all channels */
-static struct adc_channel_cfg channel_cfgs[2] = {
+static struct adc_channel_cfg channel_cfgs[4] = {
     {
         .gain = ADC_GAIN_1_2,
         .reference = ADC_REF_EXTERNAL0,
@@ -33,7 +33,20 @@ static struct adc_channel_cfg channel_cfgs[2] = {
         .reference = ADC_REF_EXTERNAL0,
 	.differential = 0,
         .acquisition_time = ADC_ACQ_TIME_DEFAULT,
-    }
+    },
+    {
+        .gain = ADC_GAIN_1_2,
+        .reference = ADC_REF_EXTERNAL0,
+	.differential = 0,
+        .acquisition_time = ADC_ACQ_TIME_DEFAULT,
+    },
+    {
+        .gain = ADC_GAIN_1_2,
+        .reference = ADC_REF_EXTERNAL0,
+	.differential = 0,
+        .acquisition_time = ADC_ACQ_TIME_DEFAULT,
+    },
+
 };
 
 /* Data array of ADC channels for the specified ADC. */
@@ -43,7 +56,7 @@ static struct adc_channel_cfg channel_cfgs[2] = {
 // /* Data array of ADC channel voltage references. */
 // static uint32_t vrefs_mv[] = {DT_FOREACH_CHILD_SEP(ADC_NODE, CHANNEL_VREF, (,))};
 
-static uint32_t vrefs_mv[] = {1800, 1800};
+static uint32_t vrefs_mv[] = {1800, 1800, 1800, 1800};
 
 /* Get the number of channels defined on the DTS. */
 #define CHANNEL_COUNT ARRAY_SIZE(channel_cfgs)
@@ -75,34 +88,36 @@ int main(void)
 		return 0;
 	}
 
-	channel_cfgs[0].channel_id = 0;
-	channel_cfgs[1].channel_id = 8;
+	channel_cfgs[0].channel_id = 2;
+	channel_cfgs[1].channel_id = 3;
+	channel_cfgs[2].channel_id = 10;
+	channel_cfgs[3].channel_id = 11;
 
 	/* Configure channels individually prior to sampling. */
 	for(size_t i = 0U; i < CHANNEL_COUNT; i++) {
 
 		sequence.channels |= BIT(channel_cfgs[i].channel_id);
 		err = adc_channel_setup(adc, &channel_cfgs[i]);
-		if (err < 0) {
+		if(err < 0) {
 			printf("Could not setup channel #%d (%d)\n", i, err);
 			return 0;
 		}
-		if ((vrefs_mv[i] == 0) && (channel_cfgs[i].reference == ADC_REF_INTERNAL)) {
-			vrefs_mv[i] = adc_ref_internal(adc);
-		}
+		// if ((vrefs_mv[i] == 0) && (channel_cfgs[i].reference == ADC_REF_INTERNAL)) {
+		// 	vrefs_mv[i] = adc_ref_internal(adc);
+		// }
 	}
 
 	while (1) {
 		printf("ADC sequence reading [%u]:\n", count++);
-		k_msleep(1000);
+		k_msleep(2000);
 
 		err = adc_read(adc, &sequence);
-		if (err < 0) {
+		if(err < 0) {
 			printf("Could not read (%d)\n", err);
 			continue;
 		}
 
-		for (size_t channel_index = 0U; channel_index < CHANNEL_COUNT; channel_index++) {
+		for(size_t channel_index = 0U; channel_index < CHANNEL_COUNT; channel_index++) {
 			int32_t val_mv;
 
 			printf("- %s, channel %" PRId32 ", %" PRId32 " sequence samples:\n",
