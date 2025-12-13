@@ -4,205 +4,108 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "zephyr/dt-bindings/adc/adc.h"
-#include <stdio.h>
-#include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/adc.h>
-#include <zephyr/drivers/sensor.h>
-
-/* ADC node from the devicetree. */
-#define ADC_NODE DT_ALIAS(adc0)
-
-/* Auxiliary macro to obtain channel vref, if available. */
-#define CHANNEL_VREF(node_id) DT_PROP_OR(node_id, zephyr_vref_mv, 0)
-
-/* Data of ADC device specified in devicetree. */
-static const struct device *adc = DEVICE_DT_GET(ADC_NODE);
-
-//#define TEMP_SENSOR_LABEL DT_ALIAS(die_temp0)
-
-/* Common initialization for all channels */
-static struct adc_channel_cfg channel_cfgs[1] = {
-    {
-	.channel_id = 11,
-        .gain = ADC_GAIN_1,
-        .reference = ADC_REF_EXTERNAL0,
-	.differential = 0,
-        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131) //ADC_ACQ_TIME_DEFAULT,
-
-    },
-		//   {
-		// .channel_id = 3,
-		//       .gain = ADC_GAIN_1_2,
-		//       .reference = ADC_REF_EXTERNAL0,
-		// .differential = 0,
-		//       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
-		//   },
-		//   {
-		// .channel_id = 10,
-		//       .gain = ADC_GAIN_1_2,
-		//       .reference = ADC_REF_EXTERNAL0,
-		// .differential = 0,
-		//       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
-		//   },
-		//   {
-		// .channel_id = 11,
-		//       .gain = ADC_GAIN_1_2,
-		//       .reference = ADC_REF_EXTERNAL0,
-		// .differential = 0,
-		//       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
-		//   },
-
-};
-
-/* Data array of ADC channels for the specified ADC. */
-// static const struct adc_channel_cfg channel_cfgs[] = {
-// 	DT_FOREACH_CHILD_SEP(ADC_NODE, ADC_CHANNEL_CFG_DT, (,))};
+// #include <stdio.h>
+// #include <zephyr/kernel.h>
+// #include <zephyr/device.h>
+// #include <zephyr/drivers/sensor.h>
+// #include <zephyr/sys/util_macro.h>
+// #include <zephyr/kernel.h>
+// #include <zephyr/rtio/rtio.h>
 //
-// /* Data array of ADC channel voltage references. */
-// static uint32_t vrefs_mv[] = {DT_FOREACH_CHILD_SEP(ADC_NODE, CHANNEL_VREF, (,))};
-
-static uint32_t vrefs_mv[] = {1800, 1800, 1800, 1800};
-
-/* Get the number of channels defined on the DTS. */
-#define CHANNEL_COUNT ARRAY_SIZE(channel_cfgs)
-
-int main(void) {
-
-    int err;
-    uint32_t count = 0;
-    uint16_t channel_reading[CONFIG_SEQUENCE_SAMPLES][CHANNEL_COUNT];
-
-    /* Options for the sequence sampling. */
-    const struct adc_sequence_options options = {
-	    .extra_samplings = CONFIG_SEQUENCE_SAMPLES - 1,
-	    .interval_us = 0,
-    };
-
-    /* Configure the sampling sequence to be made. */
-    struct adc_sequence sequence = {
-	    .buffer = channel_reading,
-	    /* buffer size in bytes, not number of samples */
-	    .buffer_size = sizeof(channel_reading),
-	    .resolution = CONFIG_SEQUENCE_RESOLUTION,
-	    .oversampling = CONFIG_SEQUENCE_OVERSAMPLING,
-	    .options = &options,
-    };
-
-    if (!device_is_ready(adc)) {
-
-	    printf("ADC controller device %s not ready\n", adc->name);
-	    return 0;
-    }
-
-    /* Configure channels individually prior to sampling. */
-    for(size_t i = 0U; i < CHANNEL_COUNT; i++) {
-
-	sequence.channels |= BIT(channel_cfgs[i].channel_id);
-	err = adc_channel_setup(adc, &channel_cfgs[i]);
-	if(err < 0) {
-
-	    printf("Could not setup channel #%d (%d)\n", channel_cfgs[i].channel_id, err);
-	    return 0;
-	}
-	// if ((vrefs_mv[i] == 0) && (channel_cfgs[i].reference == ADC_REF_INTERNAL)) {
-	    // 	vrefs_mv[i] = adc_ref_internal(adc);
-	    // }
-    }
-    while (1) {
-
-	printf("ADC sequence reading [%u]:\n", count++);
-	k_msleep(2000);
-
-	err = adc_read(adc, &sequence);
-	if(err < 0) {
-	    printf("Could not read (%d)\n", err);
-	    continue;
-	}
-
-	for(size_t channel_index = 0U; channel_index < CHANNEL_COUNT; channel_index++) {
-		int32_t val_mv;
-
-	    printf("- %s, channel %" PRId32 ", %" PRId32 " sequence samples:\n",
-		   adc->name, channel_cfgs[channel_index].channel_id,
-		   CONFIG_SEQUENCE_SAMPLES);
-	    for (size_t sample_index = 0U; sample_index < CONFIG_SEQUENCE_SAMPLES; sample_index++) {
-
-		uint8_t res = CONFIG_SEQUENCE_RESOLUTION;
-
-		/*
-		 * If using differential mode, the 16/32 bit value
-		 * in the ADC sample buffer should be a signed 2's
-		 * complement value.
-		 * Also reduce the resolution by 1 for the conversion
-		 */
-		if(channel_cfgs[channel_index].differential) {
-		    val_mv = (int32_t)((int16_t)channel_reading[sample_index]
-							       [channel_index]);
-		    res -= 1;
-		} else {
-		    val_mv = channel_reading[sample_index][channel_index];
-		}
-		printf("- - %" PRId32, val_mv);
-		err = adc_raw_to_millivolts(vrefs_mv[channel_index],
-					    channel_cfgs[channel_index].gain,
-					    res, &val_mv);
-
-		/* conversion to mV may not be supported, skip if not */
-		if ((err < 0) || vrefs_mv[channel_index] == 0) {
-			printf(" (value in mV not available)\n");
-		} else {
-			printf(" = %" PRId32 "mV\n", val_mv);
-		}
-	    }
-	}
-    }
-    return 0;
-}
-
-
-
-/* 20000 msec = 1 sec */
-// #define SLEEP_TIME_MS   1000
+// #define ACCEL_ALIAS(i) DT_ALIAS(_CONCAT(accel, i))
+// #define ACCELEROMETER_DEVICE(i, _)                                                           \
+// 	IF_ENABLED(DT_NODE_EXISTS(ACCEL_ALIAS(i)), (DEVICE_DT_GET(ACCEL_ALIAS(i)),))
+// #define NUM_SENSORS 1
 //
-// /* The devicetree node identifier for the "led0" alias. */
-// #define LED0_NODE DT_ALIAS(led0)
+// /* support up to 10 accelerometer sensors */
+// static const struct device *const sensors[] = {LISTIFY(10, ACCELEROMETER_DEVICE, ())};
 //
-// /*
-//  * A build error on this line means your board is unsupported.
-//  * See the sample documentation for information on how to fix this.
-//  */
-// static const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+// static const enum sensor_channel channels[] = {
+// 	SENSOR_CHAN_ACCEL_X,
+// 	SENSOR_CHAN_ACCEL_Y,
+// 	SENSOR_CHAN_ACCEL_Z,
+// };
+//
+// static int print_accels(const struct device *dev){
+//
+//     int ret;
+//     struct sensor_value accel[3];
+//     ret = sensor_sample_fetch(dev);
+//     if(ret < 0) {
+// 	printk("%s: sensor_sample_fetch() failed: %d\n", dev->name, ret);
+// 	return ret;
+//     }
+//
+//     for (size_t i = 0; i < ARRAY_SIZE(channels); i++) {
+// 	ret = sensor_channel_get(dev, channels[i], &accel[i]);
+// 	if (ret < 0) {
+// 	    printk("%s: sensor_channel_get(%c) failed: %d\n", dev->name, 'X' + i, ret);
+// 	    return ret;
+// 	}
+//     }
+//
+//     printk("%16s [m/s^2]:    (%12.6f, %12.6f, %12.6f)\n", dev->name,
+// 	   sensor_value_to_double(&accel[0]), sensor_value_to_double(&accel[1]),
+// 	   sensor_value_to_double(&accel[2]));
+//
+//     return 0;
+// }
+//
+// static int set_sampling_freq(const struct device *dev){
+//
+//     int ret;
+//     struct sensor_value odr;
+//
+//     ret = sensor_attr_get(dev, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_SAMPLING_FREQUENCY, &odr);
+//
+//     /* If we don't get a frequency > 0, we set one */
+//     if (ret != 0 || (odr.val1 == 0 && odr.val2 == 0)) {
+// 	odr.val1 = 100;
+// 	odr.val2 = 0;
+//
+// 	ret = sensor_attr_set(dev, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_SAMPLING_FREQUENCY,
+// 			      &odr);
+//
+// 	if(ret != 0) {
+// 	    printk("%s : failed to set sampling frequency\n", dev->name);
+// 	}
+//     }
+//     return 0;
+// }
 //
 // int main(void) {
 //
-// 	int ret;
-// 	// bool led_state = true;
+//     int ret;
+//     const struct device *const dev = DEVICE_DT_GET(DT_ALIAS(accel0));
+// 	//    for(size_t i = 0; i < ARRAY_SIZE(sensors); i++) {
 // 	//
-// 	if(!gpio_is_ready_dt(&led0)) {
-//
-// 		printf("Could not configure gpio pin!\n");
-// 		return 0;
-// 	}
+// 	// if(!device_is_ready(sensors[i])) {
 // 	//
-// 	ret = gpio_pin_configure_dt(&led0, GPIO_OUTPUT_ACTIVE);
-// 	if (ret < 0) {
+// 	//     printk("sensor: device %s not ready.\n", sensors[i]->name);
+// 	//     return 0;
+// 	// }
+// 	// set_sampling_freq(sensors[i]);
+// 	//    }
+//     if(!device_is_ready(dev)) {
 //
-// 		printf("Could not configure gpio pin!\n");
-// 		return 0;
-// 	}
-//
-//
-// 	while (1) {
-//
-// 		ret = gpio_pin_toggle_dt(&led0);
-// 		if (ret < 0) {
-// 			return 0;
-// 		}
-// 		//led_state = !led_state;
-// 		printf("Hello world from GoodEGG board!\n");
-// 		k_msleep(SLEEP_TIME_MS);
-// 	}
+// 	printk("sensor: device %s not ready.\n", dev->name);
 // 	return 0;
+//     }
+//     set_sampling_freq(dev);
+//     while (1) {
+//
+// 	ret = print_accels(dev);
+// 	if(ret < 0) {
+// 	    return 0;
+// 	}
+// 	k_msleep(1000);
+// 	// for (size_t i = 0; i < ARRAY_SIZE(sensors); i++) {
+// 	//
+// 	//     ret = print_accels(sensors[i]);
+// 	//     if(ret < 0) {
+// 	// 	return 0;
+// 	//     }
+// 	// }
+//     }
+//     return 0;
 // }
