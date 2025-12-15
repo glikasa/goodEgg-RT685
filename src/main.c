@@ -26,7 +26,7 @@ static struct adc_channel_cfg channel_cfgs[2] = {
         .gain = ADC_GAIN_1_2,
         .reference = ADC_REF_EXTERNAL0,
         .differential = 0,
-        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 100),
+        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
 
     },
     {
@@ -34,7 +34,7 @@ static struct adc_channel_cfg channel_cfgs[2] = {
         .gain = ADC_GAIN_1_2,
         .reference = ADC_REF_EXTERNAL0,
         .differential = 0,
-        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 100), //ADC_ACQ_TIME_DEFAULT,
+        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
     }};
 
 /* Data array of ADC channels for the specified ADC. */
