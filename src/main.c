@@ -24,28 +24,28 @@ static const struct device *adc = DEVICE_DT_GET(ADC_NODE);
 
 /* Common initialization for all channels */
 static struct adc_channel_cfg channel_cfgs[1] = {
-    {
-	.channel_id = 11,
-        .gain = ADC_GAIN_1,
-        .reference = ADC_REF_EXTERNAL0,
-	.differential = 0,
-        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131) //ADC_ACQ_TIME_DEFAULT,
-
-    },
-		//   {
-		// .channel_id = 3,
-		//       .gain = ADC_GAIN_1_2,
-		//       .reference = ADC_REF_EXTERNAL0,
-		// .differential = 0,
-		//       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
-		//   },
-		//   {
-		// .channel_id = 10,
-		//       .gain = ADC_GAIN_1_2,
-		//       .reference = ADC_REF_EXTERNAL0,
-		// .differential = 0,
-		//       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
-		//   },
+	//    {
+	// .channel_id = 2,
+	//        .gain = ADC_GAIN_1,
+	//        .reference = ADC_REF_EXTERNAL0,
+	// .differential = 0,
+	//        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131) //ADC_ACQ_TIME_DEFAULT,
+	//
+	//    },
+	//    {
+	// .channel_id = 3,
+	// .gain = ADC_GAIN_1_2,
+	// .reference = ADC_REF_EXTERNAL0,
+	// .differential = 0,
+	// .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
+	//    },
+		  {
+		.channel_id = 10,
+		      .gain = ADC_GAIN_1_2,
+		      .reference = ADC_REF_EXTERNAL0,
+		.differential = 0,
+		      .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), //ADC_ACQ_TIME_DEFAULT,
+		  },
 		//   {
 		// .channel_id = 11,
 		//       .gain = ADC_GAIN_1_2,

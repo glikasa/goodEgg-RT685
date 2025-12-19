@@ -161,11 +161,10 @@
 	 */
 	pinmux_lpadc0: pinmux_lpadc0 {
 		group0 {
-			pinmux = <ADC0_CH11_PIO0_27>;
-			/* pinmux = <ADC0_CH2_PIO0_19>, */
-			/* 	<ADC0_CH10_PIO0_20>, */
-			/* 	<ADC0_CH3_PIO0_26>, */
-			/* 	<ADC0_CH11_PIO0_27>; */
+			pinmux = <ADC0_CH2_PIO0_19>,
+				<ADC0_CH10_PIO0_20>,
+				<ADC0_CH3_PIO0_26>,
+				<ADC0_CH11_PIO0_27>;
 			slew-rate = "normal";
 			drive-strength = "normal";
 			nxp,analog-mode;
