@@ -35,15 +35,15 @@
 			label = "User LED_GREEN";
 		};
 
-		blue_led: led_2 {
-			gpios = <&gpio0 26 0>;
-			label = "User LED_BLUE";
-		};
-
-		red_led: led_3 {
-			gpios = <&gpio0 31 0>;
-			label = "User LED_RED";
-		};
+		/* blue_led: led_2 { */
+		/* 	gpios = <&gpio0 26 0>; */
+		/* 	label = "User LED_BLUE"; */
+		/* }; */
+		/**/
+		/* red_led: led_3 { */
+		/* 	gpios = <&gpio0 31 0>; */
+		/* 	label = "User LED_RED"; */
+		/* }; */
 	};
 
 	gpio_keys {

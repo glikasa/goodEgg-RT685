@@ -171,6 +171,17 @@
 		};
 	};
 
+	/* pinmux_lpadc0: pinmux_lpadc0 { */
+	/* 	group0 { */
+	/* 		pinmux = <ADC0_CH2_PIO0_19>, */
+	/* 			<ADC0_CH8_PIO0_6>, */
+	/*  			<ADC0_CH10_PIO0_20>, */
+	/* 			<ADC0_CH0_PIO0_5>; */
+	/* 		slew-rate = "normal"; */
+	/* 		drive-strength = "normal"; */
+	/* 		nxp,analog-mode; */
+	/* 	}; */
+	/* }; */
 	pinmux_pmic_i2c: pinmux_pmic_i2c {
 		group0 {
 			pinmux = <PMIC_I2C_SCL>,
@@ -183,16 +194,16 @@
 		};
 	};
 
-	pinmux_sctimer: pinmux_sctimer {
-		group0 {
-			pinmux = <SCT0_OUT7_PIO0_27>,
-				 <SCT0_OUT0_PIO0_14>,
-				 <SCT0_OUT6_PIO0_26>,
-				 <SCT0_OUT6_PIO0_31>;
-			slew-rate = "normal";
-			drive-strength = "normal";
-		};
-	};
+	/* pinmux_sctimer: pinmux_sctimer { */
+	/* 	group0 { */
+	/* 		pinmux = <SCT0_OUT7_PIO0_27>, */
+	/* 			 <SCT0_OUT0_PIO0_14>, */
+	/* 			 <SCT0_OUT6_PIO0_26>, */
+	/* 			 <SCT0_OUT6_PIO0_31>; */
+	/* 		slew-rate = "normal"; */
+	/* 		drive-strength = "normal"; */
+	/* 	}; */
+	/* }; */
 
 	pinmux_usdhc: pinmux_usdhc {
 		group0 {
