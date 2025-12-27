@@ -34,7 +34,7 @@ static uint32_t vrefs_mv[] = {1800, 1800, 1800, 1800};
 
 static struct adc_channel_cfg channel_cfgs[CHANNEL_COUNT] = {
     {
-        .channel_id = 2,
+        .channel_id = 3,
         .gain = ADC_GAIN_1_2,
         .reference = ADC_REF_EXTERNAL0,
         .differential = 0,
@@ -42,31 +42,31 @@ static struct adc_channel_cfg channel_cfgs[CHANNEL_COUNT] = {
             ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131), // ADC_ACQ_TIME_DEFAULT,
         .input_positive = 0,
     },
-    {
-        .channel_id = 3,
-        .gain = ADC_GAIN_1_2,
-        .reference = ADC_REF_EXTERNAL0,
-        .differential = 0,
-        .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
-        .input_positive = 2,
-        // ADC_ACQ_TIME_DEFAULT,
-
-    },
-      {
-    .channel_id = 10,
-          .gain = ADC_GAIN_1_2,
-          .reference = ADC_REF_EXTERNAL0,
-    .differential = 0,
-          .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
-      },
-      {
-    .channel_id = 11,
-          .gain = ADC_GAIN_1_2,
-          .reference = ADC_REF_EXTERNAL0,
-    .differential = 0,
-          .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
-          //ADC_ACQ_TIME_DEFAULT,
-      },
+    // {
+    //     .channel_id = 3,
+    //     .gain = ADC_GAIN_1_2,
+    //     .reference = ADC_REF_EXTERNAL0,
+    //     .differential = 0,
+    //     .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
+    //     .input_positive = 2,
+    //     // ADC_ACQ_TIME_DEFAULT,
+    //
+    // },
+    //   {
+    // .channel_id = 10,
+    //       .gain = ADC_GAIN_1_2,
+    //       .reference = ADC_REF_EXTERNAL0,
+    // .differential = 0,
+    //       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
+    //   },
+    //   {
+    // .channel_id = 11,
+    //       .gain = ADC_GAIN_1_2,
+    //       .reference = ADC_REF_EXTERNAL0,
+    // .differential = 0,
+    //       .acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 131),
+    //       //ADC_ACQ_TIME_DEFAULT,
+    //   },
 
 };
 

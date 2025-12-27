@@ -88,10 +88,10 @@
         // The io-channels property lives HERE, on the consumer node.
         // Format: <&controller_phandle channel_specifier>
 		io-channels = 
-            <&lpadc0 2>, // Read Hardware Channel 0 from &adc0
-            <&lpadc0 3>, // Read Hardware Channel 2 from &adc0
-            <&lpadc0 10>, // Read Hardware Channel 0 from &adc0
-            <&lpadc0 11>; // Read Hardware Channel 0 from &adc0
+            /* <&lpadc0 2>, // Read Hardware Channel 0 from &adc0 */
+             <&lpadc0 3>; // Read Hardware Channel 2 from &adc0 */
+            /* <&lpadc0 10>, // Read Hardware Channel 0 from &adc0 */
+            /* <&lpadc0 11>; // Read Hardware Channel 0 from &adc0 */
 
 	    zephyr,gain = "ADC_GAIN_1_2"; 
 	    zephyr,reference = "ADC_REF_EXTERNAL0"; 
