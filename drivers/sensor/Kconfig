@@ -1,3 +1,0 @@
-if SENSOR
-	rsource "adpd188/Kconfig"
-endif

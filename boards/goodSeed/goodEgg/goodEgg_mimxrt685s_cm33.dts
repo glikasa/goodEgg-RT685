@@ -39,6 +39,7 @@
 		mbox = &mbox;
 		//led0 = &led0;
 		adc0 = &lpadc0; 
+		adpd0 = &adpd188bi;
 
 		//bme6xx = &bme680;
 		//die-temp0 = &adc_temp;
@@ -62,13 +63,10 @@
 	/* 	}; */
 	/* }; */
 	//Bitbang i2c sensor interface
-	i2c_0_bitbang: i2c-gpio-0 {
+	i2c_1_bitbang: i2c-gpio-1 {
 
 		compatible = "gpio-i2c";
 		label = "I2C_0_BITBANG";
-	 	/* pinctrl-0 = <&pinmux_flexcomm2_i2c>;  */
-	 	/* pinctrl-names = "default";  */
-
 		scl-gpios = <&gpio0 14 GPIO_OPEN_DRAIN >; //<&gpio7 25 GPIO_OPEN_DRAIN >; // | GPIO_PULL_UP)>; 
 		sda-gpios = <&gpio0 16 GPIO_OPEN_DRAIN >; //<&gpio7 27 GPIO_OPEN_DRAIN >;
 		clock-frequency = <I2C_BITRATE_STANDARD>;
@@ -90,6 +88,31 @@
 			/* reset-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>; */
 		};
 
+
+	};
+	i2c_0_bitbang: i2c-gpio-0 {
+
+		compatible = "gpio-i2c";
+		label = "I2C_0_BITBANG";
+		scl-gpios = <&gpio7 25 GPIO_OPEN_DRAIN >; //<&gpio7 25 GPIO_OPEN_DRAIN >; // | GPIO_PULL_UP)>; 
+		sda-gpios = <&gpio7 27 GPIO_OPEN_DRAIN >; //<&gpio7 27 GPIO_OPEN_DRAIN >;
+		clock-frequency = <I2C_BITRATE_STANDARD>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "okay";
+
+		/* bme680:bme680@76 { */
+		/* 	compatible = "bosch,bme680"; */
+		/* 	reg = <0x76>; */
+		/* 	status = "okay"; */
+		/* }; */
+
+		adpd188bi: analog_adpd188@64 {
+			compatible = "analog,adpd188";
+			status = "okay";
+			reg = <0x64>; 
+			label = "ADPD188BI_SENSOR";
+		};
 
 	};
 

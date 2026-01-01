@@ -1,0 +1,17 @@
+config ADPD188
+    bool "ADPD188BI Smoke Detection Sensor Driver"
+    default y
+    depends on SENSOR
+    help
+      Enable the Zephyr sensor driver for the Analog Devices ADPD188.
+
+if ADPD188
+
+config ADPD188_I2C
+    bool "ADPD188 via I2C"
+    default y
+    depends on I2C
+    help
+      Enable I2C support for the ADPD188 sensor.
+
+endif # ADPD188BI
