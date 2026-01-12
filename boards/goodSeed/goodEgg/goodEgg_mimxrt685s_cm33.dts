@@ -112,6 +112,7 @@
 			status = "okay";
 			reg = <0x64>; 
 			label = "ADPD188BI_SENSOR";
+			int-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
 		};
 
 	};

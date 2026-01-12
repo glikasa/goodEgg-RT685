@@ -9,13 +9,8 @@ compatible: "analog,adpd188"
 
 include: base.yaml
 
-# properties:
-#   reg:
-#     required: true
-#
-#   touch-gpios:
-#     type: phandle-array
-#     required: false
-#     description: |
-#       Touch input GPIO (active high). When the sensor is touched, the GPIO is
-#       set to high. It is used to trigger a fingerprint read.
+properties:
+  int-gpios:
+    type: phandle-array
+    required: false
+    description: Data-ready interrupt pin 
