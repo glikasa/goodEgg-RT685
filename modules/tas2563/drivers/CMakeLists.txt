@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_TAS2563 tas2563)

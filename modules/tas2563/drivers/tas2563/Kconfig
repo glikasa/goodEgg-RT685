@@ -1,0 +1,26 @@
+config TAS2563
+    bool "TI TAS2563 SmartAMP Driver"
+    default n
+    help
+      Enable the driver for the Texas Instruments TAS2563 SmartAMP.
+
+if TAS2563
+
+config TAS2563_I2C_ENABLE
+    bool "Enable I2C Communication (Default)"
+    default y
+    # This setting is used to define the -DI2C_ENABLE flag
+    depends on TAS2563
+
+config TAS2563_RX_16BIT
+    bool "Enable RX 16-bit mode"
+    default y
+    # This setting is used to define the -DRX_16BIT flag
+    depends on TAS2563
+
+config TAS2563_PDM_ENABLE
+    bool "Enable PDM recording"
+    default n
+    depends on TAS2563
+
+endif # TAS2563_SMARTAMP_DRIVER

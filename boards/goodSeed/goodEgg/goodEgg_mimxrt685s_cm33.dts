@@ -24,6 +24,7 @@
 		/* led1 = &blue_led; */
 		/* led2 = &red_led; */
 		usart-0 = &flexcomm4;
+		uart0=&flexcomm7;
 		/* For pwm test suites */
 		/* pwm-0 = &sc_timer; */
 		/* pwm-led0 = &green_pwm_led; */
@@ -113,6 +114,24 @@
 			reg = <0x64>; 
 			label = "ADPD188BI_SENSOR";
 			int-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+		};
+
+		tas2563_amp: tas2563@4c {
+
+			compatible = "ti,tas2563"; // Standard compatibility string for driver matching
+
+			reg = <0x4c>;              // The 7-bit I2C address of the TAS2563
+
+			// The driver will use this property to configure the I2S peripheral.
+			audio-interface = <&i2s0>; 
+
+			// a) RESET Pin (required for initial startup and soft resets)
+			reset-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>; 
+
+			// b) INTERRUPT Pin (for real-time events like short-circuit or thermal warning)
+			int-gpios = <&gpio1 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+
+			status = "okay";
 		};
 
 	};
@@ -205,7 +224,10 @@
 	};
 };
 
+&clkctl1 {
 
+	status = "okay";
+};
 /*
  * RT600 EVK board uses OS timer as the kernel timer
  * In case we need to switch to SYSTICK timer, then
@@ -239,6 +261,39 @@
 	pinctrl-names = "default";
 	dmas = <&dma0 8>, <&dma0 9>;
 	dma-names = "rx", "tx";
+};
+
+
+&flexcomm7 {
+	compatible = "nxp,lpc-usart";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm7_usart>;
+	pinctrl-names = "default";
+	dmas = <&dma0 14>, <&dma0 15>;
+	dma-names = "rx", "tx";
+};
+
+//I2S transmit channel 
+/* i2s0: &flexcomm7 { */
+/* 	status = "okay"; */
+/* 	compatible = "nxp,lpc-i2s"; */
+/* 	#address-cells = <1>; */
+/* 	#size-cells = <0>; */
+/* 	dmas = <&dma0 15>; */
+/* 	dma-names = "tx"; */
+/* 	pinctrl-0 = <&pinmux_flexcomm7_i2s>; */
+/* 	pinctrl-names = "default"; */
+/* }; */
+i2s0: &flexcomm6 {
+	status = "okay";
+	compatible = "nxp,lpc-i2s";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	dmas = <&dma0 13>;
+	dma-names = "tx";
+	pinctrl-0 = <&pinmux_flexcomm6_i2s>;
+	pinctrl-names = "default";
 };
 
 /* arduino_i2c: &flexcomm2 { */
@@ -294,7 +349,7 @@
 /* }; */
 /**/
 /* I2S transmit channel */ 
-/* i2s1: &flexcomm3 { */
+/* i2s0: &flexcomm3 { */
 /* 	status = "okay"; */
 /* 	compatible = "nxp,lpc-i2s"; */
 /* 	#address-cells = <1>; */
@@ -304,7 +359,7 @@
 /* 	pinctrl-0 = <&pinmux_flexcomm3_i2s>; */
 /* 	pinctrl-names = "default"; */
 /* }; */
-
+/**/
 /* PCA9420 PMIC */
 &pmic_i2c {
 	status = "okay";
@@ -399,6 +454,10 @@
 };
 
 &gpio3 {
+	status = "okay";
+};
+
+&gpio4 {
 	status = "okay";
 };
 

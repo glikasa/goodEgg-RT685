@@ -1,0 +1,14 @@
+
+#ifndef ZEPHYR_DRIVERS_SENSOR_ADPD188BI_H_
+#define ZEPHYR_DRIVERS_SENSOR_ADPD188BI_H_
+
+#include <zephyr/drivers/sensor.h>
+
+enum adpd188bi_channel {
+
+    ADPD188_CHAN_ALL = SENSOR_CHAN_PRIV_START,
+    ADPD188_CHAN_BLUE,
+    ADPD188_CHAN_IR,
+};
+
+#endif /* ZEPHYR_DRIVERS_SENSOR_ADPD188BI_H_ */
