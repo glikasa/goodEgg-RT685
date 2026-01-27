@@ -374,9 +374,8 @@ static void adpd188bi_work_handler(struct k_work *work){
 	}
         adpd188_interrupt_clear(data->adpd_dev, ADPD188_FIFO_INT);
     }
-
-    data->smoke_data.blue_data = buff[0] | (buff[1] << 16);
-    data->smoke_data.ir_data = buff[2] | (buff[3] << 16);
+    data->smoke_data.blue_data = (int32_t)buff[0] | ((int32_t)buff[1] << 16);
+    data->smoke_data.ir_data = (int32_t)buff[2] | ((int32_t)buff[3] << 16);
     if(data->trig_handler != NULL) {
 
 	    struct sensor_trigger trig = {
@@ -463,8 +462,8 @@ static int adpd188bi_sample_fetch(const struct device *dev, enum sensor_channel 
 	    return -EIO;
 	}
     }
-    data->smoke_data.blue_data = buff[0] | (buff[1] << 16);
-    data->smoke_data.ir_data = buff[2] | (buff[3] << 16);
+    data->smoke_data.blue_data = (int32_t)buff[0] | ((int32_t)buff[1] << 16);
+    data->smoke_data.ir_data = (int32_t)buff[2] | ((int32_t)buff[3] << 16);
     return 0;
 }
 
