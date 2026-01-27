@@ -153,29 +153,29 @@
 		};
 	};
 
-	pinmux_flexspi: pinmux_flexspi {
-		group0 {
-			pinmux = <FLEXSPI0B_DATA0_PIO1_11>,
-				 <FLEXSPI0B_DATA1_PIO1_12>,
-				 <FLEXSPI0B_DATA2_PIO1_13>,
-				 <FLEXSPI0B_DATA3_PIO1_14>,
-				 <FLEXSPI0B_SCLK_PIO1_29>,
-				 <FLEXSPI0B_DATA4_PIO2_17>,
-				 <FLEXSPI0B_DATA5_PIO2_18>,
-				 <FLEXSPI0B_SS0_N_PIO2_19>,
-				 <FLEXSPI0B_DATA6_PIO2_22>,
-				 <FLEXSPI0B_DATA7_PIO2_23>;
-			input-enable;
-			slew-rate = "normal";
-			drive-strength = "high";
-		};
-
-		group1 {
-			pinmux = <GPIO_PIO212_PIO2_12>;
-			slew-rate = "normal";
-			drive-strength = "normal";
-		};
-	};
+	/* pinmux_flexspi: pinmux_flexspi { */
+	/* 	group0 { */
+	/* 		pinmux = <FLEXSPI0B_DATA0_PIO1_11>, */
+	/* 			 <FLEXSPI0B_DATA1_PIO1_12>, */
+	/* 			 <FLEXSPI0B_DATA2_PIO1_13>, */
+	/* 			 <FLEXSPI0B_DATA3_PIO1_14>, */
+	/* 			 <FLEXSPI0B_SCLK_PIO1_29>, */
+	/* 			 <FLEXSPI0B_DATA4_PIO2_17>, */
+	/* 			 <FLEXSPI0B_DATA5_PIO2_18>, */
+	/* 			 <FLEXSPI0B_SS0_N_PIO2_19>, */
+	/* 			 <FLEXSPI0B_DATA6_PIO2_22>, */
+	/* 			 <FLEXSPI0B_DATA7_PIO2_23>; */
+	/* 		input-enable; */
+	/* 		slew-rate = "normal"; */
+	/* 		drive-strength = "high"; */
+	/* 	}; */
+	/**/
+	/* 	group1 { */
+	/* 		pinmux = <GPIO_PIO212_PIO2_12>; */
+	/* 		slew-rate = "normal"; */
+	/* 		drive-strength = "normal"; */
+	/* 	}; */
+	/* }; */
 
 	/*
 	 * The current test and sample applications uses a single channel for

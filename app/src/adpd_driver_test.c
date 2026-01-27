@@ -12,7 +12,7 @@
 void on_data_ready(const struct device *dev, const struct sensor_trigger *trigger) {
 
     struct sensor_value smoke;
-    if(sensor_channel_get(dev, SENSOR_CHAN_VOC, &smoke) < 0) {
+    if(sensor_channel_get(dev,ADPD188_CHAN_ALL, &smoke) < 0) {
 
 	printk("%s: Failed to get smoke data \n", dev->name);
 	return;
