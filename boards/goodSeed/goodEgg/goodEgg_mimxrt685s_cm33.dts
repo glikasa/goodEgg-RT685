@@ -224,10 +224,10 @@
 	/* }; */
 };
 
-&clkctl1 {
-
-	status = "okay";
-};
+/* &clkctl1 { */
+/**/
+/* 	status = "okay"; */
+/* }; */
 /*
  * RT600 EVK board uses OS timer as the kernel timer
  * In case we need to switch to SYSTICK timer, then
