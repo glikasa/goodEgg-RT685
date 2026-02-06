@@ -292,50 +292,14 @@ void tas256x_poweron(struct tas256x_priv* pTAS256X, unsigned int profile)
 //
 //
 
-uint8_t tx_buf[2048];
 int exTas256x_speakeron(const struct device *dev, uint32_t profile){
 
-
-    const struct tas2563_config *cfg = dev->config;
-
-    LOG_INF("Writing to I2C");
-    if(i2c_write_dt(&cfg->i2c, tx_buf, sizeof(tx_buf)) == 0) {
-
-        LOG_ERR("Failed to Write to I2C: %u ", cfg->i2c.addr);
-    }
-    return 0;
-
-
-
-
-
-
     struct tas2563_data *tasdata = dev->data;
-    const struct tas2563_config *config = dev->config;
     struct tas256x_priv* pTAS256X = &tasdata->lib_priv;
 
     tas256x_dspon(pTAS256X, profile);
     tas256x_poweron(pTAS256X, profile);
     pTAS256X->dev_state = SMARTPA_POWERON;
-
-
-    struct i2s_config i2s_conf = {
-        .word_size = SAMPLE_BIT_WIDTH,
-        .channels = NUMBER_OF_CHANNELS,
-        .format = I2S_FMT_DATA_FORMAT_I2S,
-        .options = I2S_OPT_BIT_CLK_MASTER | I2S_OPT_FRAME_CLK_MASTER,
-        .frame_clk_freq = SAMPLE_FREQUENCY,
-        .mem_slab = &mem_slab,
-        .block_size = BLOCK_SIZE,
-        .timeout = TIMEOUT,
-    };
-
-    LOG_DBG("Configuring I2S");
-    if(i2s_configure(config->i2s, I2S_DIR_TX, &i2s_conf)) {
-
-        LOG_ERR("I2S Config failed");
-        return -1;
-    }
     return 0;
 }
 
@@ -372,15 +336,14 @@ int stream_audio_samples(const struct device *dev, const int16_t *samples, uint3
     LOG_INF("Starting: %u samples, %u bytes", num_samples, bytes_left);
 
     if(!device_is_ready(cfg->i2s)) {
+
         LOG_ERR("I2S device not ready!");
         return -ENODEV;
     }
-
     while(bytes_left > 0) {
 
         void *mem_block;
         //LOG_INF("Alloc attempt %d, bytes_left=%u", queued_buffers + 1, bytes_left);
-
         ret = k_mem_slab_alloc(&mem_slab, &mem_block, K_MSEC(1000));
         if(ret < 0) {
 
@@ -447,10 +410,6 @@ err_stop:
 
 int tas2563_lib_init(const struct device *dev){
 
-
-    return 0;
-
-
     const struct tas2563_config *cfg = dev->config;
     struct tas2563_data *data = dev->data;
     struct tas256x_priv *p = &data->lib_priv;
@@ -493,22 +452,22 @@ static int tas2563_init(const struct device *dev){
         return -ENODEV;
     }
 
-    // struct i2s_config i2s_conf = {
-    //     .word_size = SAMPLE_BIT_WIDTH,
-    //     .channels = NUMBER_OF_CHANNELS,
-    //     .format = I2S_FMT_DATA_FORMAT_I2S,
-    //     .options = I2S_OPT_BIT_CLK_MASTER | I2S_OPT_FRAME_CLK_MASTER,
-    //     .frame_clk_freq = SAMPLE_FREQUENCY,
-    //     .mem_slab = &mem_slab,
-    //     .block_size = BLOCK_SIZE,
-    //     .timeout = TIMEOUT,
-    // };
-    //
-    // ret = i2s_configure(config->i2s, I2S_DIR_TX, &i2s_conf);
-    // if (ret < 0) {
-    //     LOG_ERR("I2S Config failed: %d", ret);
-    //     return ret;
-    // }
+    struct i2s_config i2s_conf = {
+        .word_size = SAMPLE_BIT_WIDTH,
+        .channels = NUMBER_OF_CHANNELS,
+        .format = I2S_FMT_DATA_FORMAT_I2S,
+        .options = I2S_OPT_BIT_CLK_MASTER | I2S_OPT_FRAME_CLK_MASTER,
+        .frame_clk_freq = SAMPLE_FREQUENCY,
+        .mem_slab = &mem_slab,
+        .block_size = BLOCK_SIZE,
+        .timeout = TIMEOUT,
+    };
+
+    ret = i2s_configure(config->i2s, I2S_DIR_TX, &i2s_conf);
+    if (ret < 0) {
+        LOG_ERR("I2S Config failed: %d", ret);
+        return ret;
+    }
     // uint32_t rate = 0;
     // const struct i2s_mcux_config *i2s_cfg = config->i2s->config;
     // clock_control_get_rate(i2s_cfg->clock_dev, i2s_cfg->clock_subsys, &rate);

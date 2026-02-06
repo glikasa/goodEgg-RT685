@@ -24,7 +24,7 @@
 		/* led1 = &blue_led; */
 		/* led2 = &red_led; */
 		usart-0 = &flexcomm4;
-		uart0=&flexcomm7;
+		//uart0=&flexcomm7;
 		/* For pwm test suites */
 		/* pwm-0 = &sc_timer; */
 		/* pwm-led0 = &green_pwm_led; */
@@ -113,7 +113,7 @@
 			status = "okay";
 			reg = <0x64>; 
 			label = "ADPD188BI_SENSOR";
-			int-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+			int-gpios = <&gpio1 14 GPIO_ACTIVE_LOW>;
 		};
 
 		tas2563_amp: tas2563@4c {
@@ -224,10 +224,6 @@
 	/* }; */
 };
 
-/* &clkctl1 { */
-/**/
-/* 	status = "okay"; */
-/* }; */
 /*
  * RT600 EVK board uses OS timer as the kernel timer
  * In case we need to switch to SYSTICK timer, then
@@ -264,38 +260,38 @@
 };
 
 
-&flexcomm7 {
-	compatible = "nxp,lpc-usart";
-	status = "okay";
-	current-speed = <115200>;
-	pinctrl-0 = <&pinmux_flexcomm7_usart>;
-	pinctrl-names = "default";
-	dmas = <&dma0 14>, <&dma0 15>;
-	dma-names = "rx", "tx";
-};
+/* &flexcomm7 { */
+/* 	compatible = "nxp,lpc-usart"; */
+/* 	status = "okay"; */
+/* 	current-speed = <115200>; */
+/* 	pinctrl-0 = <&pinmux_flexcomm7_usart>; */
+/* 	pinctrl-names = "default"; */
+/* 	dmas = <&dma0 14>, <&dma0 15>; */
+/* 	dma-names = "rx", "tx"; */
+/* }; */
 
 //I2S transmit channel 
-/* i2s0: &flexcomm7 { */
-/* 	status = "okay"; */
-/* 	compatible = "nxp,lpc-i2s"; */
-/* 	#address-cells = <1>; */
-/* 	#size-cells = <0>; */
-/* 	dmas = <&dma0 15>; */
-/* 	dma-names = "tx"; */
-/* 	pinctrl-0 = <&pinmux_flexcomm7_i2s>; */
-/* 	pinctrl-names = "default"; */
-/* }; */
-i2s0: &flexcomm6 {
+i2s0: &flexcomm7 {
 	status = "okay";
 	compatible = "nxp,lpc-i2s";
 	#address-cells = <1>;
 	#size-cells = <0>;
-	dmas = <&dma0 13>;
+	dmas = <&dma0 15>;
 	dma-names = "tx";
-	pinctrl-0 = <&pinmux_flexcomm6_i2s>;
+	pinctrl-0 = <&pinmux_flexcomm7_i2s>;
 	pinctrl-names = "default";
 };
-
+/* i2s0: &flexcomm6 { */
+/* 	status = "okay"; */
+/* 	compatible = "nxp,lpc-i2s"; */
+/* 	#address-cells = <1>; */
+/* 	#size-cells = <0>; */
+/* 	dmas = <&dma0 13>; */
+/* 	dma-names = "tx"; */
+/* 	pinctrl-0 = <&pinmux_flexcomm6_i2s>; */
+/* 	pinctrl-names = "default"; */
+/* }; */
+/**/
 /* arduino_i2c: &flexcomm2 { */
 /* 	compatible = "nxp,lpc-i2c"; */
 /* 	status = "okay"; */
