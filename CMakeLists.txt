@@ -7,5 +7,5 @@ list(APPEND ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/adpd188")
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(goodEgg-RT685)
 
-target_sources(app PRIVATE app/src/adpd_driver_test.c)
+target_sources(app PRIVATE app/src/led_driver.c)
 

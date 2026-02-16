@@ -1,0 +1,6 @@
+config PI22TAT 
+    bool "LED driver"
+    depends on SPI
+    help
+      Enable LED driver fori IN-PI22TAT5R5G5B.
+
