@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_WIFI_ESP_HOSTED_SDIO esp_hosted)

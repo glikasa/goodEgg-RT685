@@ -24,7 +24,7 @@
 		/* led0 = &green_led; */
 		/* led1 = &blue_led; */
 		/* led2 = &red_led; */
-		usart-0 = &flexcomm0;
+		usart-0 = &flexcomm4;
 		//uart0=&flexcomm7;
 		/* For pwm test suites */
 		/* pwm-0 = &sc_timer; */
@@ -35,14 +35,14 @@
 		watchdog0 = &wwdt0;
 		/* magn0 = &fxos8700; */
 		accel0 = &lis2dw12; 
-		sdhc0 = &usdhc0;
+		//sdhc0 = &usdhc0;
 		dmic-dev = &dmic0;
 		//mcuboot-button0 = &user_button_1;
 		mbox = &mbox;
 		//led0 = &led0;
 		adc0 = &lpadc0; 
 		adpd0 = &adpd188bi;
-		led-strip = &led_strip;
+		//led-strip = &led_strip;
 
 		//bme6xx = &bme680;
 		//die-temp0 = &adc_temp;
@@ -52,10 +52,10 @@
 		/* zephyr,flash-controller = &mx25um51345g; */
 		zephyr,flash = &sram_code;/*&mx25um51345g; */
 		zephyr,code-partition = &sram_code;
-		zephyr,uart-mcumgr = &flexcomm0;
+		zephyr,uart-mcumgr = &flexcomm4;
 		zephyr,sram = &sram0;
-		zephyr,console = &flexcomm0;
-		zephyr,shell-uart = &flexcomm0;
+		zephyr,console = &flexcomm4;
+		zephyr,shell-uart = &flexcomm4;
 	};
 
 	/* leds { */
@@ -251,47 +251,47 @@
 };
 
 
-/* &flexcomm4 { */
-/* 	compatible = "nxp,lpc-usart"; */
-/* 	status = "okay"; */
-/* 	current-speed = <115200>; */
-/* 	pinctrl-0 = <&pinmux_flexcomm4_usart>; */
-/* 	pinctrl-names = "default"; */
-/* 	dmas = <&dma0 8>, <&dma0 9>; */
-/* 	dma-names = "rx", "tx"; */
-/* }; */
-
 &flexcomm4 {
-	compatible = "nxp,lpc-spi";
+	compatible = "nxp,lpc-usart";
 	status = "okay";
-	#address-cells = <1>;
-	#size-cells = <0>;
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm4_usart>;
+	pinctrl-names = "default";
 	dmas = <&dma0 8>, <&dma0 9>;
 	dma-names = "rx", "tx";
-	pinctrl-0 = <&pinmux_flexcomm4_spi>;
-	pinctrl-names = "default";
-
-	led_strip: pi22tat@0 {
-		compatible = "worldsemi,ws2812-spi";
-		reg = <0>;
-		/* Calculated Frequency: 6.4MHz 
-		 * Datasheet requires 1.25us total bit time (0.156us per SPI bit) 
-		*/
-		spi-max-frequency = <6400000>;
-		chain-length = <60>;  /* Number of LEDs */
-		/* * 0-code: 0.3us High / 0.9us Low  
-	         * 0.3us / 0.156us ≈ 2 bits high -> 11000000 (0xC0)
-		 */
-		spi-zero-frame = <0xC0>;
-		/* * 1-code: 0.9us High / 0.3us Low 
-		 * 0.9us / 0.156us ≈ 6 bits high -> 11111100 (0xFC)
-		*/
-		spi-one-frame = <0xFC>;
-		color-mapping = <LED_COLOR_ID_GREEN
-				 LED_COLOR_ID_RED
-				 LED_COLOR_ID_BLUE>;
-	};
 };
+
+/* &flexcomm4 { */
+/* 	compatible = "nxp,lpc-spi"; */
+/* 	status = "okay"; */
+/* 	#address-cells = <1>; */
+/* 	#size-cells = <0>; */
+/* 	dmas = <&dma0 8>, <&dma0 9>; */
+/* 	dma-names = "rx", "tx"; */
+/* 	pinctrl-0 = <&pinmux_flexcomm4_spi>; */
+/* 	pinctrl-names = "default"; */
+/**/
+/* 	led_strip: pi22tat@0 { */
+/* 		compatible = "worldsemi,ws2812-spi"; */
+/* 		reg = <0>; */
+/* 		/* Calculated Frequency: 6.4MHz  */
+/* 		 * Datasheet requires 1.25us total bit time (0.156us per SPI bit)  */
+/* 		*/ 
+/* 		spi-max-frequency = <6400000>; */
+/* 		chain-length = <60>;  /* Number of LEDs */ 
+/* 		/* * 0-code: 0.3us High / 0.9us Low   */
+/* 	         * 0.3us / 0.156us ≈ 2 bits high -> 11000000 (0xC0) */
+/* 		 */ 
+/* 		spi-zero-frame = <0xC0>; */
+/* 		/* * 1-code: 0.9us High / 0.3us Low  */
+/* 		 * 0.9us / 0.156us ≈ 6 bits high -> 11111100 (0xFC) */
+/* 		*/ 
+/* 		spi-one-frame = <0xFC>; */
+/* 		color-mapping = <LED_COLOR_ID_GREEN */
+/* 				 LED_COLOR_ID_RED */
+/* 				 LED_COLOR_ID_BLUE>; */
+/* 	}; */
+/* }; */
 
 /* &flexcomm7 { */
 /* 	compatible = "nxp,lpc-usart"; */
@@ -528,17 +528,26 @@ i2s0: &flexcomm7 {
 /* 	pinctrl-names = "default"; */
 /* }; */
 
-&usdhc0 {
-	status = "disabled";
+&usdhc1 {
+	status = "okay";
 	/* Quick fix for 1.8V SD cards on RT600- disable 1.8V negotiation */
 	no-1-8-v;
-	pwr-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
-	cd-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
+	/* pwr-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>; */
+	/* cd-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>; */
 
-	sdmmc {
-		compatible = "zephyr,sdmmc-disk";
-		disk-name = "SD";
-		status = "disabled";
+	/* sdmmc { */
+	/* 	compatible = "zephyr,sdmmc-disk"; */
+	/* 	disk-name = "SD"; */
+	/* 	status = "disabled"; */
+	/* }; */
+	#address-cells = <1>;
+	#size-cells = <0>;
+	esp32: esp32@1 {
+
+		status = "okay";
+		compatible = "espressif,esp-hosted-sdio";
+		reg = <1>;
+		reset-gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
 	};
 	pinctrl-0 = <&pinmux_usdhc>;
 	pinctrl-names = "default";
