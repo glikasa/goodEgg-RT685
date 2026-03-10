@@ -1,4 +1,5 @@
 
+#include "zephyr/net/net_ip.h"
 #include <stdio.h>
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
@@ -12,8 +13,8 @@
 LOG_MODULE_REGISTER(wifi_test, LOG_LEVEL_INF);
 
 /* Change these to your local network credentials */
-#define SSID "get_hotspot"
-#define PSK  "Your_Password"
+#define SSID "get_hotspot"//"Galaxy A03s 6733"
+#define PSK   "ng4382yarbywh6" //"arvd7827"
 
 static struct net_mgmt_event_callback wifi_cb;
 
@@ -33,8 +34,31 @@ static void wifi_event_handler(struct net_mgmt_event_callback *cb,
 	}
         break;
     }
-    case NET_EVENT_IPV4_ADDR_ADD:
+    case NET_EVENT_IPV4_ADDR_ADD: {
+	struct in_addr *addr;
+
+	addr = net_if_ipv4_get_global_addr(iface, NET_ADDR_PREFERRED);
+	if (addr) {
+	    char addr_str[NET_IPV4_ADDR_LEN];
+
+	    net_addr_ntop(AF_INET, addr,
+			  addr_str, sizeof(addr_str));
+
+	    LOG_INF("IPv4 address obtained: %s", addr_str);
+	}
+        // char addr_str[NET_IPV4_ADDR_LEN];
+        // for (int i = 0; i < NET_IF_MAX_IPV4_ADDR; i++) {
+        //
+        //     struct net_if_addr *if_addr = &iface->config.ip.ipv4->unicast[i];
+        //     if(if_addr->addr_type != NET_ADDR_DHCP) {
+        //         continue;
+        //     }
+        //     LOG_INF("IPv4 address obtained: %s",
+        //             net_addr_ntop(AF_INET, &if_addr->address.in_addr,
+        //                           addr_str, sizeof(addr_str)));
+        // }
 	break;
+    }
 
     case NET_EVENT_WIFI_DISCONNECT_RESULT:
 	LOG_INF("WIFI disconnected!");
@@ -74,10 +98,10 @@ int main(void) {
 
 	/* Trigger the connection */
 	/* This calls your driver's .connect function via the Zephyr API */
-	if(net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &params, sizeof(params))) {
-	    LOG_ERR("Connection request failed");
-	    return -1;
-	}
+	// if(net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &params, sizeof(params))) {
+	//     LOG_ERR("Connection request failed");
+	//     return -1;
+	// }
 
     k_sleep(K_FOREVER);
     return 0;

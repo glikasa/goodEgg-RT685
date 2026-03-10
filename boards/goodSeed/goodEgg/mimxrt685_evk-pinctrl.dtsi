@@ -245,9 +245,9 @@
 	/* 			 <USDHC0_USDHC_DATA0_PIO2_0>, */
 	/* 			 <USDHC0_USDHC_DATA1_PIO2_1>, */
 	/* 			 <USDHC0_USDHC_DATA2_PIO2_2>, */
-	/* 			 <USDHC0_USDHC_DATA3_PIO2_3>, */
-	/* 			 <GPIO_PIO29_PIO2_9>; */
-	/* 		bias-pull-up; */
+	/* 			 <USDHC0_USDHC_DATA3_PIO2_3>; */
+	/* 			 //<GPIO_PIO29_PIO2_9>; */
+	/* 		//bias-pull-up; */
 	/* 		input-enable; */
 	/* 		slew-rate = "normal"; */
 	/* 		drive-strength = "normal"; */
@@ -259,14 +259,13 @@
 	/* 		slew-rate = "normal"; */
 	/* 		drive-strength = "normal"; */
 	/* 	}; */
-	/**/
-	/* 	group2 { */
-	/* 		pinmux = <GPIO_PIO210_PIO2_10>, */
-	/* 			 <GPIO_PIO24_PIO2_4>; */
-	/* 		slew-rate = "normal"; */
-	/* 		drive-strength = "normal"; */
-	/* 	}; */
-	/* }; */
+		/* group2 { */
+		/* 	pinmux = <GPIO_PIO210_PIO2_10>, */
+		/* 		 <GPIO_PIO24_PIO2_4>; */
+		/* 	slew-rate = "normal"; */
+		/* 	drive-strength = "high"; */
+		/* }; */
+	//}; 
 
 	pinmux_usdhc: pinmux_usdhc {
 		group0 {
@@ -279,7 +278,7 @@
 			bias-pull-up;
 			input-enable;
 			slew-rate = "normal";
-			drive-strength = "normal";
+			drive-strength = "high";
 		};
 
 		group1 {
@@ -288,13 +287,6 @@
 			slew-rate = "normal";
 			drive-strength = "normal";
 		};
-
-		/* group2 { */
-		/* 	pinmux = <GPIO_PIO210_PIO2_10>, */
-		/* 		 <GPIO_PIO24_PIO2_4>; */
-		/* 	slew-rate = "normal"; */
-		/* 	drive-strength = "normal"; */
-		/* }; */
 	};
 	pinmux_i3c: pinmux_i3c {
 		group0 {

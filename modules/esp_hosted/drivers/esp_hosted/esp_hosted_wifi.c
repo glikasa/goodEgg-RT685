@@ -117,7 +117,6 @@ static int esp_hosted_response(const struct device *dev, CtrlMsgId msg_id, CtrlM
 		LOG_ERR("response %d failed %d", msg_id, esp_hosted_ctrl_response(ctrl_msg));
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -586,10 +585,11 @@ static int esp_hosted_dev_init(const struct device *dev){
 
 	esp_hosted_data_t *data = dev->data;
 
-	printk("Initialization device HAL");
+	printk("Initializing device HAL");
 	/* Pins config and SDIO init. */
-	if(esp_hosted_hal_init(dev)) {
+	if(esp_hosted_hal_init(dev) != 0) {
 
+		LOG_ERR("Failed to initialize HAL");
 		return -EAGAIN;
 	}
 

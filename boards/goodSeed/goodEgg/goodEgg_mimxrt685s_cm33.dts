@@ -42,6 +42,9 @@
 		//led0 = &led0;
 		adc0 = &lpadc0; 
 		adpd0 = &adpd188bi;
+
+		 /* led0 = &led0;  */
+		 /* led1 = &led1; */
 		//led-strip = &led_strip;
 
 		//bme6xx = &bme680;
@@ -61,8 +64,13 @@
 	/* leds { */
 	/* 	compatible = "gpio-leds"; */
 	/* 	led0: led_0 { */
-	/* 		gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>; */
+	/* 		gpios = <&gpio3 8 GPIO_ACTIVE_HIGH>; */
 	/* 		label = "Red LED 0"; */
+	/* 	}; */
+	/**/
+	/* 	led1: led_1 { */
+	/* 		gpios = <&gpio3 9 GPIO_ACTIVE_HIGH>; */
+	/* 		label = "Green LED 0"; */
 	/* 	}; */
 	/* }; */
 	//Bitbang i2c sensor interface
@@ -532,6 +540,7 @@ i2s0: &flexcomm7 {
 	status = "okay";
 	/* Quick fix for 1.8V SD cards on RT600- disable 1.8V negotiation */
 	no-1-8-v;
+	max-bus-freq = <400000>;
 	/* pwr-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>; */
 	/* cd-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>; */
 
@@ -547,6 +556,7 @@ i2s0: &flexcomm7 {
 		status = "okay";
 		compatible = "espressif,esp-hosted-sdio";
 		reg = <1>;
+		//reset-gpios = <&gpio1 9 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
 	};
 	pinctrl-0 = <&pinmux_usdhc>;

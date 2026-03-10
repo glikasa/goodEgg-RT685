@@ -7,6 +7,7 @@
 #ifndef ZEPHYR_DRIVERS_WIFI_ESP_HOSTED_WIFI_H_
 #define ZEPHYR_DRIVERS_WIFI_ESP_HOSTED_WIFI_H_
 
+#include <stdint.h>
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 
@@ -71,7 +72,8 @@ typedef struct {
 
 	struct sd_card card;
 	struct sdio_func sdio_func1;
-
+	uint32_t cumulative_read_len;  /* Track cumulative read length */
+	uint16_t cumulative_num_buffers_writtern; /*Cumulative number of buffers written sofar */
 } esp_hosted_data_t;
 
 #define TLV_HEADER_SIZE      (14)
@@ -80,7 +82,7 @@ typedef struct {
 #define TLV_HEADER_EP_RESP   "ctrlResp"
 #define TLV_HEADER_EP_EVENT  "ctrlEvnt"
 
-#define ESP_FRAME_SIZE           (1600)
+#define ESP_FRAME_SIZE           (1536)//(1600)
 #define ESP_FRAME_HEADER_SIZE    (12)
 #define ESP_FRAME_MAX_PAYLOAD    (ESP_FRAME_SIZE - ESP_FRAME_HEADER_SIZE)
 #define ESP_FRAME_FLAGS_FRAGMENT (1 << 0)
