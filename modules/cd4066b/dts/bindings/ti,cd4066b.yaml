@@ -1,0 +1,27 @@
+# Copyright (c) 2024
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  TI CD4066B CMOS Quad Bilateral Switch driver.
+  Controls analog switches via GPIO pins with interrupt support.
+
+compatible: "ti,cd4066b"
+
+include: base.yaml
+
+properties:
+  tx-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO pin to control TX switch (active high)
+
+  rx-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO pin to control RX switch (active high)
+
+  sig-in-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO pin for signal input interrupt
+

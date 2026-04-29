@@ -4,9 +4,9 @@ cmake_minimum_required(VERSION 3.20.0)
 #set(ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/tas2563")
 # list(APPEND ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/tas2563")
 #list(APPEND ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/adpd188")
-list(APPEND ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/esp_hosted")
+list(APPEND ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/cd4066b")
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(goodEgg-RT685)
 
-target_sources(app PRIVATE app/src/lte_modem_test.c)
+target_sources(app PRIVATE app/src/cd4066b_interconnect_test.c)
 
