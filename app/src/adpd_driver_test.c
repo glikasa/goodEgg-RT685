@@ -30,33 +30,35 @@ int main(void) {
 	printk("sensor: device %s not ready.\n", dev->name);
 	return -EIO;
     }
-    const struct sensor_trigger trig = {.type = SENSOR_TRIG_DATA_READY, .chan = ADPD188_CHAN_ALL};
-    if(sensor_trigger_set(dev, &trig, on_data_ready) < 0) {
-
-	printk("sensor: device %s could not set trigger.\n", dev->name);
-    }
-    printk("Smoke sensor started in interrupt mode");
-    //set_sampling_freq(dev);
-    while(1) {
-
-	k_sleep(K_FOREVER);
-    }
-	//    while (1) {
+	//    const struct sensor_trigger trig = {.type = SENSOR_TRIG_DATA_READY, .chan = ADPD188_CHAN_ALL};
+	//    if(sensor_trigger_set(dev, &trig, on_data_ready) < 0) {
 	//
-	// struct sensor_value smoke;
-	// ret = sensor_sample_fetch(dev);
-	// if(ret < 0) {
-	//     printk("%s: sensor_sample_fetch() failed: %d\n", dev->name, ret);
-	//     return ret;
-	// }
-	//
-	// ret = sensor_channel_get(dev, SENSOR_CHAN_VOC, &smoke);
-	// if (ret < 0) {
-	//     printk("%s: Failed to get smoke data %d\n", dev->name, ret);
-	//     return ret;
-	// }
-	// printk("%16s : Blue data: %d   IR data: %d\n", dev->name, smoke.val1, smoke.val2);
-	// k_msleep(1000);
+	// printk("sensor: device %s could not set trigger.\n", dev->name);
 	//    }
+	//    printk("Smoke sensor started in interrupt mode");
+	//    //set_sampling_freq(dev);
+	//    while(1) {
+	//
+	// k_sleep(K_FOREVER);
+	//    }
+    struct sensor_value smoke_blue;
+    struct sensor_value smoke_ir;
+    while (1) {
+
+	ret = sensor_sample_fetch(dev);
+	if(ret < 0) {
+	    printk("%s: sensor_sample_fetch() failed: %d\n", dev->name, ret);
+	    return ret;
+	}
+
+	ret = sensor_channel_get(dev, SMOKE_CHAN_BLUE, &smoke_blue);
+	ret = sensor_channel_get(dev, SMOKE_CHAN_IR, &smoke_ir);
+	if (ret < 0) {
+	    printk("%s: Failed to get smoke data %d\n", dev->name, ret);
+	    return ret;
+	}
+	printk("%16s : Blue data: %d   IR data: %d\n", dev->name, smoke_blue.val1, smoke_ir.val1);
+	k_msleep(1000);
+    }
     return 0;
 }

@@ -6,7 +6,7 @@
 
 /dts-v1/;
 
-#include <nxp/nxp_rt6xx.dtsi>
+#include <nxp/imxrt/nxp_rt6xx.dtsi>
 #include <zephyr/dt-bindings/pwm/pwm.h>
 #include <zephyr/dt-bindings/gpio/arduino-header-r3.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
@@ -82,7 +82,7 @@
 
 		lis2dw12: lis2dw12@19 {
 			compatible = "st,lis2dw12";
-			status = "okay";
+			status = "disabled";
 			reg = <0x19>;
 			/* int1-gpios = <&gpio1 5 GPIO_ACTIVE_LOW>; */
 			/* reset-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>; */

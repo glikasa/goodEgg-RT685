@@ -4,11 +4,10 @@
 
 #include <zephyr/drivers/sensor.h>
 
-enum adpd188bi_channel {
+enum smoke_channel {
 
-    ADPD188_CHAN_ALL = SENSOR_CHAN_PRIV_START,
-    ADPD188_CHAN_BLUE,
-    ADPD188_CHAN_IR,
+    SMOKE_CHAN_BLUE = SENSOR_CHAN_PRIV_START,
+    SMOKE_CHAN_IR,
 };
 
 #endif /* ZEPHYR_DRIVERS_SENSOR_ADPD188BI_H_ */

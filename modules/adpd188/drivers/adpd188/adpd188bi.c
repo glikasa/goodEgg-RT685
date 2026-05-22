@@ -435,14 +435,13 @@ static int adpd188bi_init(const struct device *dev){
 }
 
 
-
 //Sensor Sample Fetch (The core data acquisition)
 static int adpd188bi_sample_fetch(const struct device *dev, enum sensor_channel chan) {
 
-    if((enum adpd188bi_channel)chan != ADPD188_CHAN_ALL) {
-
-	return -ENOTSUP;
-    }
+	//    if((enum adpd188bi_channel)chan != ADPD188_CHAN_ALL) {
+	//
+	// return -ENOTSUP;
+	//    }
     struct adpd188bi_data *data = dev->data;
     uint8_t byte_no;
     uint16_t buff[(2 * NUM_ACTIVE_TIMESLOTS)];
@@ -470,17 +469,26 @@ static int adpd188bi_sample_fetch(const struct device *dev, enum sensor_channel 
 //Sensor Value Get (Retrieves fetched data)
 static int adpd188bi_channel_get(const struct device *dev,
                                  enum sensor_channel chan,
-                                 struct sensor_value *val)
-{
+                                 struct sensor_value *val) {
    
-    if((enum adpd188bi_channel)chan != ADPD188_CHAN_ALL) {
 
-	return -ENOTSUP;
-    }
     struct adpd188bi_data *data = dev->data;
-    val->val1 = data->smoke_data.blue_data;
-    val->val2 = data->smoke_data.ir_data;
-    return 0;
+    switch ((enum smoke_channel)chan) {
+
+    case SMOKE_CHAN_BLUE:
+
+        val->val1 = data->smoke_data.blue_data;
+        val->val2 = 0;
+        return 0;
+
+    case SMOKE_CHAN_IR:
+        val->val1 = data->smoke_data.ir_data;
+        val->val2 = 0;
+        return 0;
+
+    default:
+        return -ENOTSUP;
+    }
 }
 
 #ifdef CONFIG_ADPD188_TRIGGER
