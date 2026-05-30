@@ -1,0 +1,16 @@
+
+# Copyright (c) 2022 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  ADPD188 is smoke sensor from analog electronics. 
+
+compatible: "analog,adpd188"
+
+include: base.yaml
+
+properties:
+  int-gpios:
+    type: phandle-array
+    required: false
+    description: Data-ready interrupt pin 
