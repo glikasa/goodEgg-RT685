@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_ADPD188 ledPI22TAT5)

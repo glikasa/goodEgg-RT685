@@ -1,0 +1,6 @@
+name: esp_hosted
+build:
+  cmake: .
+  kconfig: Kconfig
+  settings:
+    dts_root: .

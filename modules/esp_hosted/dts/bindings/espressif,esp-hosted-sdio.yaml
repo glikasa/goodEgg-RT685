@@ -1,0 +1,22 @@
+
+# Copyright (c) 2022 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+description: |
+    Espressif ESP-Hosted SDIO Wi-Fi offload driver.
+    This binding is used for the SDIO implementation of the Hosted protocol,
+    typically used with NXP RT600 or similar high-performance hosts.
+
+compatible: "espressif,esp-hosted-sdio"
+
+include: base.yaml
+
+properties:
+  reg:
+    description: SDIO Function number (should be 1)
+
+  reset-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      GPIO connected to the ESP32's EN (Reset) pin.
+

@@ -12,6 +12,7 @@
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
 #include "mimxrt685_evk-pinctrl.dtsi"
+#include <zephyr/dt-bindings/led/led.h>
 
 / {
 	model = "GoodSeed GoodEgg board";
@@ -24,6 +25,7 @@
 		/* led1 = &blue_led; */
 		/* led2 = &red_led; */
 		usart-0 = &flexcomm4;
+		//uart0=&flexcomm7;
 		/* For pwm test suites */
 		/* pwm-0 = &sc_timer; */
 		/* pwm-led0 = &green_pwm_led; */
@@ -33,13 +35,17 @@
 		watchdog0 = &wwdt0;
 		/* magn0 = &fxos8700; */
 		accel0 = &lis2dw12; 
-		sdhc0 = &usdhc0;
+		//sdhc0 = &usdhc0;
 		dmic-dev = &dmic0;
 		//mcuboot-button0 = &user_button_1;
 		mbox = &mbox;
 		//led0 = &led0;
 		adc0 = &lpadc0; 
 		adpd0 = &adpd188bi;
+
+		 /* led0 = &led0;  */
+		 /* led1 = &led1; */
+		//led-strip = &led_strip;
 
 		//bme6xx = &bme680;
 		//die-temp0 = &adc_temp;
@@ -58,8 +64,13 @@
 	/* leds { */
 	/* 	compatible = "gpio-leds"; */
 	/* 	led0: led_0 { */
-	/* 		gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>; */
+	/* 		gpios = <&gpio3 8 GPIO_ACTIVE_HIGH>; */
 	/* 		label = "Red LED 0"; */
+	/* 	}; */
+	/**/
+	/* 	led1: led_1 { */
+	/* 		gpios = <&gpio3 9 GPIO_ACTIVE_HIGH>; */
+	/* 		label = "Green LED 0"; */
 	/* 	}; */
 	/* }; */
 	//Bitbang i2c sensor interface
@@ -112,7 +123,25 @@
 			status = "okay";
 			reg = <0x64>; 
 			label = "ADPD188BI_SENSOR";
-			int-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+			int-gpios = <&gpio1 14 GPIO_ACTIVE_LOW>;
+		};
+
+		tas2563_amp: tas2563@4c {
+
+			compatible = "ti,tas2563"; // Standard compatibility string for driver matching
+
+			reg = <0x4c>;              // The 7-bit I2C address of the TAS2563
+
+			// The driver will use this property to configure the I2S peripheral.
+			audio-interface = <&i2s0>; 
+
+			// a) RESET Pin (required for initial startup and soft resets)
+			reset-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>; 
+
+			// b) INTERRUPT Pin (for real-time events like short-circuit or thermal warning)
+			int-gpios = <&gpio1 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+
+			status = "okay";
 		};
 
 	};
@@ -188,36 +217,35 @@
 	/* 	}; */
 	/* }; */
 	/**/
-	arduino_header: arduino-connector {
-		compatible = "arduino-header-r3";
-		#gpio-cells = <2>;
-		gpio-map-mask = <0xffffffff 0xffffffc0>;
-		gpio-map-pass-thru = <0 0x3f>;
-		gpio-map = <ARDUINO_HEADER_R3_A0 0 &gpio0 5 0>,
-			   <ARDUINO_HEADER_R3_A1 0 &gpio0 6 0>,
-			   <ARDUINO_HEADER_R3_A2 0 &gpio0 19 0>,
-			   <ARDUINO_HEADER_R3_A3 0 &gpio0 20 0>,
-			   <ARDUINO_HEADER_R3_A4 0 &gpio0 17 0>,
-			   <ARDUINO_HEADER_R3_A5 0 &gpio0 18 0>,
-			   <ARDUINO_HEADER_R3_D0 0 &gpio0 30 0>,
-			   <ARDUINO_HEADER_R3_D1 0 &gpio0 29 0>,
-			   <ARDUINO_HEADER_R3_D2 0 &gpio0 28 0>,
-			   <ARDUINO_HEADER_R3_D3 0 &gpio0 27 0>,
-			   <ARDUINO_HEADER_R3_D4 0 &gpio1 0 0>,
-			   <ARDUINO_HEADER_R3_D5 0 &gpio1 10 0>,
-			   <ARDUINO_HEADER_R3_D6 0 &gpio1 2 0>,
-			   <ARDUINO_HEADER_R3_D7 0 &gpio1 8 0>,
-			   <ARDUINO_HEADER_R3_D8 0 &gpio1 9 0>,
-			   <ARDUINO_HEADER_R3_D9 0 &gpio1 7 0>,
-			   <ARDUINO_HEADER_R3_D10 0 &gpio1 6 0>,
-			   <ARDUINO_HEADER_R3_D11 0 &gpio1 5 0>,
-			   <ARDUINO_HEADER_R3_D12 0 &gpio1 4 0>,
-			   <ARDUINO_HEADER_R3_D13 0 &gpio1 3 0>,
-			   <ARDUINO_HEADER_R3_D14 0 &gpio0 17 0>,
-			   <ARDUINO_HEADER_R3_D15 0 &gpio0 18 0>;
-	};
+	/* arduino_header: arduino-connector { */
+	/* 	compatible = "arduino-header-r3"; */
+	/* 	#gpio-cells = <2>; */
+	/* 	gpio-map-mask = <0xffffffff 0xffffffc0>; */
+	/* 	gpio-map-pass-thru = <0 0x3f>; */
+	/* 	gpio-map = <ARDUINO_HEADER_R3_A0 0 &gpio0 5 0>, */
+	/* 		   <ARDUINO_HEADER_R3_A1 0 &gpio0 6 0>, */
+	/* 		   <ARDUINO_HEADER_R3_A2 0 &gpio0 19 0>, */
+	/* 		   <ARDUINO_HEADER_R3_A3 0 &gpio0 20 0>, */
+	/* 		   <ARDUINO_HEADER_R3_A4 0 &gpio0 17 0>, */
+	/* 		   <ARDUINO_HEADER_R3_A5 0 &gpio0 18 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D0 0 &gpio0 30 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D1 0 &gpio0 29 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D2 0 &gpio0 28 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D3 0 &gpio0 27 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D4 0 &gpio1 0 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D5 0 &gpio1 10 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D6 0 &gpio1 2 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D7 0 &gpio1 8 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D8 0 &gpio1 9 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D9 0 &gpio1 7 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D10 0 &gpio1 6 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D11 0 &gpio1 5 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D12 0 &gpio1 4 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D13 0 &gpio1 3 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D14 0 &gpio0 17 0>, */
+	/* 		   <ARDUINO_HEADER_R3_D15 0 &gpio0 18 0>; */
+	/* }; */
 };
-
 
 /*
  * RT600 EVK board uses OS timer as the kernel timer
@@ -254,6 +282,70 @@
 	dma-names = "rx", "tx";
 };
 
+/* &flexcomm4 { */
+/* 	compatible = "nxp,lpc-spi"; */
+/* 	status = "okay"; */
+/* 	#address-cells = <1>; */
+/* 	#size-cells = <0>; */
+/* 	dmas = <&dma0 8>, <&dma0 9>; */
+/* 	dma-names = "rx", "tx"; */
+/* 	pinctrl-0 = <&pinmux_flexcomm4_spi>; */
+/* 	pinctrl-names = "default"; */
+/**/
+/* 	led_strip: pi22tat@0 { */
+/* 		compatible = "worldsemi,ws2812-spi"; */
+/* 		reg = <0>; */
+/* 		/* Calculated Frequency: 6.4MHz  */
+/* 		 * Datasheet requires 1.25us total bit time (0.156us per SPI bit)  */
+/* 		*/ 
+/* 		spi-max-frequency = <6400000>; */
+/* 		chain-length = <60>;  /* Number of LEDs */ 
+/* 		/* * 0-code: 0.3us High / 0.9us Low   */
+/* 	         * 0.3us / 0.156us ≈ 2 bits high -> 11000000 (0xC0) */
+/* 		 */ 
+/* 		spi-zero-frame = <0xC0>; */
+/* 		/* * 1-code: 0.9us High / 0.3us Low  */
+/* 		 * 0.9us / 0.156us ≈ 6 bits high -> 11111100 (0xFC) */
+/* 		*/ 
+/* 		spi-one-frame = <0xFC>; */
+/* 		color-mapping = <LED_COLOR_ID_GREEN */
+/* 				 LED_COLOR_ID_RED */
+/* 				 LED_COLOR_ID_BLUE>; */
+/* 	}; */
+/* }; */
+
+/* &flexcomm7 { */
+/* 	compatible = "nxp,lpc-usart"; */
+/* 	status = "okay"; */
+/* 	current-speed = <115200>; */
+/* 	pinctrl-0 = <&pinmux_flexcomm7_usart>; */
+/* 	pinctrl-names = "default"; */
+/* 	dmas = <&dma0 14>, <&dma0 15>; */
+/* 	dma-names = "rx", "tx"; */
+/* }; */
+
+//I2S transmit channel 
+i2s0: &flexcomm7 {
+	status = "okay";
+	compatible = "nxp,lpc-i2s";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	dmas = <&dma0 15>;
+	dma-names = "tx";
+	pinctrl-0 = <&pinmux_flexcomm7_i2s>;
+	pinctrl-names = "default";
+};
+/* i2s0: &flexcomm6 { */
+/* 	status = "okay"; */
+/* 	compatible = "nxp,lpc-i2s"; */
+/* 	#address-cells = <1>; */
+/* 	#size-cells = <0>; */
+/* 	dmas = <&dma0 13>; */
+/* 	dma-names = "tx"; */
+/* 	pinctrl-0 = <&pinmux_flexcomm6_i2s>; */
+/* 	pinctrl-names = "default"; */
+/* }; */
+/**/
 /* arduino_i2c: &flexcomm2 { */
 /* 	compatible = "nxp,lpc-i2c"; */
 /* 	status = "okay"; */
@@ -307,7 +399,7 @@
 /* }; */
 /**/
 /* I2S transmit channel */ 
-/* i2s1: &flexcomm3 { */
+/* i2s0: &flexcomm3 { */
 /* 	status = "okay"; */
 /* 	compatible = "nxp,lpc-i2s"; */
 /* 	#address-cells = <1>; */
@@ -317,7 +409,7 @@
 /* 	pinctrl-0 = <&pinmux_flexcomm3_i2s>; */
 /* 	pinctrl-names = "default"; */
 /* }; */
-
+/**/
 /* PCA9420 PMIC */
 &pmic_i2c {
 	status = "okay";
@@ -415,6 +507,10 @@
 	status = "okay";
 };
 
+&gpio4 {
+	status = "okay";
+};
+
 &gpio7 {
 	status = "okay";
 };
@@ -453,17 +549,28 @@
 /* 	pinctrl-names = "default"; */
 /* }; */
 
-&usdhc0 {
-	status = "disabled";
+&usdhc1 {
+	status = "okay";
 	/* Quick fix for 1.8V SD cards on RT600- disable 1.8V negotiation */
 	no-1-8-v;
-	pwr-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
-	cd-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
+	max-bus-freq = <400000>;
+	/* pwr-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>; */
+	/* cd-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>; */
 
-	sdmmc {
-		compatible = "zephyr,sdmmc-disk";
-		disk-name = "SD";
-		status = "disabled";
+	/* sdmmc { */
+	/* 	compatible = "zephyr,sdmmc-disk"; */
+	/* 	disk-name = "SD"; */
+	/* 	status = "disabled"; */
+	/* }; */
+	#address-cells = <1>;
+	#size-cells = <0>;
+	esp32: esp32@1 {
+
+		status = "okay";
+		compatible = "espressif,esp-hosted-sdio";
+		reg = <1>;
+		//reset-gpios = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
 	};
 	pinctrl-0 = <&pinmux_usdhc>;
 	pinctrl-names = "default";

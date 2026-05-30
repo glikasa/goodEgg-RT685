@@ -155,12 +155,10 @@ int32_t no_os_i2cbus_init(const struct no_os_i2c_init_param *param) {return 0;}
 /* Free the resources allocated for I2C  bus desc*/
 void no_os_i2cbus_remove(uint32_t bus_number) {}
 
-
 int32_t no_os_spi_init(struct no_os_spi_desc **spi_desc, const struct no_os_spi_init_param * params) {
 
     return 0;
 }
-
 
 int32_t no_os_spi_remove(struct no_os_spi_desc *spi_desc) {
 
@@ -204,7 +202,6 @@ int32_t no_os_spi_transfer_abort(struct no_os_spi_desc *desc) {
     return 0;
 }
 
-
 int32_t no_os_gpio_get(struct no_os_gpio_desc **desc,
 		       const struct no_os_gpio_init_param *param){return 0;}
 
@@ -243,25 +240,152 @@ static const struct no_os_i2c_platform_ops zephyr_i2c_ops = {
     .i2c_ops_remove = no_os_i2c_remove
 };
 
+
+#if CONFIG_ADPD188_TRIGGER
+//Data ready interrupt handler-here we simply submit a work and ofload
+//the actual sensor reading to a thread
+static void adpd188bi_data_ready_isr(const struct device *port,
+                               struct gpio_callback *cb,
+                               uint32_t pins) {
+
+    struct adpd188bi_data *data = CONTAINER_OF(cb, struct adpd188bi_data, drdy_cb);
+    k_work_submit(&data->work);
+}
+
+static void adpd188bi_work_handler(struct k_work *work){
+
+    LOG_INF("ADPD work handler running");
+    struct adpd188bi_data *data = CONTAINER_OF(work, struct adpd188bi_data, work);
+
+    //uint8_t byte_no;
+    uint16_t buff[(2 * NUM_ACTIVE_TIMESLOTS)];
+    uint8_t flags;
+    adpd188_interrupt_get(data->adpd_dev, &flags);
+
+    if(flags & ADPD188_FIFO_INT) {
+
+	for(int i = 0; i < (2 * NUM_ACTIVE_TIMESLOTS); i++) {
+
+	    if(adpd188_reg_read(data->adpd_dev, ADPD188_REG_FIFO_ACCESS, (buff + i)) != 0) {
+		return;
+	    }
+	}
+        adpd188_interrupt_clear(data->adpd_dev, ADPD188_FIFO_INT);
+    }
+    data->smoke_data.blue_data = (int32_t)buff[0] | ((int32_t)buff[1] << 16);
+    data->smoke_data.ir_data = (int32_t)buff[2] | ((int32_t)buff[3] << 16);
+    if(data->trig_handler != NULL) {
+
+	    struct sensor_trigger trig = {
+		    .chan = SENSOR_CHAN_VOC,
+		    .type = SENSOR_TRIG_DATA_READY,
+	    };
+
+	data->trig_handler(data->dev, &trig);
+    }
+}
+static int adpd188bi_interrupt_init(const struct device *dev) {
+
+    struct adpd188bi_data *data = dev->data;
+    const struct adpd188bi_config *cfg = dev->config;
+
+    if(!device_is_ready(cfg->int_gpio.port)) {
+        return -ENODEV;
+    }
+    if(gpio_pin_configure_dt(&cfg->int_gpio, GPIO_INPUT) != 0) {
+
+	return -ENODEV;
+    }
+
+    gpio_pin_interrupt_configure_dt(&cfg->int_gpio, GPIO_INT_EDGE_FALLING);//GPIO_INT_EDGE_TO_ACTIVE);
+    gpio_init_callback(&data->drdy_cb, adpd188bi_data_ready_isr, BIT(cfg->int_gpio.pin));
+    gpio_add_callback(cfg->int_gpio.port, &data->drdy_cb);
+    k_work_init(&data->work, adpd188bi_work_handler);
+    data->dev = dev;
+    LOG_INF("Successfully registered data ready ISR");
+    return 0;
+}
+
+
+/**
+ * @brief Enable Interrupts specifically for the Smoke Detection setup.
+ * This assumes the sensor is already in program mode
+ * @param dev - The ADPD188 descriptor.
+ * @return 0 in case of success, -1 otherwise.
+ */
+int enable_smoke_detect_interrupts(struct adpd188_dev *dev){
+
+    int ret;
+
+    /* * Set FIFO Threshold.
+     * Smoke detect setup uses 2 slots (A & B) in 32-bit mode.
+     * Each 32-bit sample = two 16-bit words.
+     * Total packet size = 4 words. 
+     * Threshold = (4 words - 1) = 3.
+     */
+    ret = adpd188_fifo_thresh_set(dev, 3);
+    if (ret != 0) return -1;
+
+    // Enable FIFO Interrupt.
+    ret = adpd188_interrupt_en(dev, ADPD188_FIFO_INT);
+    if (ret != 0) return -1;
+
+    // Configure GPIO0 as the Interrupt Output.
+    struct adpd188_gpio_config gpio_cfg = {
+        .gpio_id = 0,	    // GPIO0
+        .gpio_en = 1,	    // Enable GPIO0
+        .gpio_pol = 0,     // Active Low (typical for interrupts)
+        .gpio_drv = 1      // Push-pull drive
+    };
+    ret = adpd188_gpio_setup(dev, gpio_cfg);
+    if (ret != 0) return -1;
+
+    /* Set GPIO0 function to 'Interrupt' (Alternative Config) */
+    ret = adpd188_gpio_alt_setup(dev, 0, ADPD188_INT_FUNC);
+    if (ret != 0) return -1;
+
+    return 0;
+
+
+	// if(adpd188_fifo_thresh_set(data->adpd_dev, 4) != 0) {
+	//
+	//     LOG_ERR("Failed to set FIFO threshold");
+	// }
+	// if(adpd188_interrupt_en(data->adpd_dev, ADPD188_FIFO_INT) != 0) {
+	//
+	//     LOG_ERR("Failed to enable FIFO interrupt");
+	// }
+	//
+	// adpd188_gpio_alt_setup(data->adpd_dev, 0, ADPD188_INT_FUNC);
+	//
+	// struct adpd188_gpio_config gpio_cfg = {
+	//     .gpio_id = 0,
+	//     .gpio_pol = 1,
+	//     .gpio_drv = 1,
+	//     .gpio_en = 1
+	// };
+	// adpd188_gpio_setup(data->adpd_dev, gpio_cfg);
+
+}
+
+#endif
+
 static int adpd188bi_core_init(struct adpd188bi_data *data, const struct adpd188bi_config *config) {
 
     struct adpd188_init_param adpd_init;
 
     adpd_init.phy_opt = ADPD188_I2C;
-
     adpd_init.phy_init.i2c_phy.extra = (void*)config->i2c.bus;
     adpd_init.phy_init.i2c_phy.device_id = ADPD188BI;
     adpd_init.phy_init.i2c_phy.max_speed_hz = config->i2c_clock_freq;
     adpd_init.phy_init.i2c_phy.slave_address = config->i2c.addr;
     adpd_init.phy_init.i2c_phy.platform_ops = &zephyr_i2c_ops;
 
-
     /* GPIO initialization is generally dependent on the platform used */
     adpd_init.gpio0_init.number = 1; /* Platform dependent; this is a dummy value */
     adpd_init.gpio0_init.extra = NULL; /* Platform dependent; this is a dummy value */
     adpd_init.gpio1_init.number = 2; /* Platform dependent; this is a dummy value */
     adpd_init.gpio1_init.extra = NULL; /* Platform dependent; this is a dummy value */
-
 
     uint16_t reg_data;
     if(adpd188_init(&data->adpd_dev, &adpd_init) != 0) {
@@ -289,6 +413,7 @@ static int adpd188bi_core_init(struct adpd188bi_data *data, const struct adpd188
     reg_data |= ADPD188_SAMPLE_CLK_CLK32K_EN_MASK;
     if(adpd188_reg_write(data->adpd_dev, ADPD188_REG_SAMPLE_CLK, reg_data) != 0) {
 
+	LOG_ERR("Failed to Enable the 32kHz clock");
 	return -EIO;
     }
     /* Activate program mode */
@@ -298,81 +423,22 @@ static int adpd188bi_core_init(struct adpd188bi_data *data, const struct adpd188
 	return -EIO;
     }
 
-#if CONFIG_ADPD188_TRIGGER
-
-    if(config->int_gpio.port != NULL) {
-
-	if(adpd188_fifo_thresh_set(data->adpd_dev, 4) != 0) {
-
-	    LOG_ERR("Failed to set FIFO threshold");
-	}
-	if(adpd188_interrupt_en(data->adpd_dev, ADPD188_FIFO_INT) != 0) {
-
-	    LOG_ERR("Failed to enable FIFO interrupt");
-	}
-
-	adpd188_gpio_alt_setup(data->adpd_dev, 0, ADPD188_INT_FUNC);
-
-	struct adpd188_gpio_config gpio_cfg = {
-	    .gpio_id = 0,
-	    .gpio_pol = 1,
-	    .gpio_drv = 1,
-	    .gpio_en = 1
-	};
-	adpd188_gpio_setup(data->adpd_dev, gpio_cfg);
-
-	LOG_INF("ADPD configuration in interrupt mode successful");
-    }
-    
-#endif
     /* Initialize device in the datasheet smoke detection configuration */
     if(adpd188_smoke_detect_setup(data->adpd_dev) != 0) {
 
 	LOG_ERR("Failed to set the device in program mode");
 	return -EIO;
     }
-
-    //Start Normal Mode operation : Enter Normal Sampling Mode (Register 0x10 = 0x0002) to begin operation.
-    if(adpd188_mode_set(data->adpd_dev, ADPD188_NORMAL) != 0) {
-
-	LOG_ERR("Failed to set the device in Normal Mode");
-	return -EIO;
-    }
-    return 0;
-}
-
 #if CONFIG_ADPD188_TRIGGER
-//Data ready interrupt handler-here we simply submit a work and ofload
-//the actual sensor reading to a thread
-static void adpd188bi_data_ready_isr(const struct device *port,
-                               struct gpio_callback *cb,
-                               uint32_t pins) {
 
-    struct adpd188bi_data *data = CONTAINER_OF(cb, struct adpd188bi_data, drdy_cb);
-    k_work_submit(&data->work);
-}
+    if(config->int_gpio.port != NULL) {
 
-static void adpd188bi_work_handler(struct k_work *work){
+	if(enable_smoke_detect_interrupts(data->adpd_dev)){
 
-    LOG_INF("ADPD work handler running");
-    struct adpd188bi_data *data = CONTAINER_OF(work, struct adpd188bi_data, work);
-
-    //uint8_t byte_no;
-    uint16_t buff[(2 * NUM_ACTIVE_TIMESLOTS)];
-
-    uint8_t flags;
-
-    adpd188_interrupt_get(data->adpd_dev, &flags);
-
-    if(flags & ADPD188_FIFO_INT) {
-
-	for(int i = 0; i < (2 * NUM_ACTIVE_TIMESLOTS); i++) {
-
-	    if(adpd188_reg_read(data->adpd_dev, ADPD188_REG_FIFO_ACCESS, (buff + i)) != 0) {
-		return;
-	    }
+	    LOG_INF("Failed to configure ADPD in an interrupt mode");
+	    return -1;
 	}
-        adpd188_interrupt_clear(data->adpd_dev, ADPD188_FIFO_INT);
+	LOG_INF("ADPD configuration in interrupt mode successful");
     }
     data->smoke_data.blue_data = (int32_t)buff[0] | ((int32_t)buff[1] << 16);
     data->smoke_data.ir_data = (int32_t)buff[2] | ((int32_t)buff[3] << 16);
@@ -410,6 +476,9 @@ static int adpd188bi_interrupt_init(const struct device *dev) {
 
 }
 #endif
+    return 0;
+}
+
 
 static int adpd188bi_init(const struct device *dev){
 
@@ -426,11 +495,18 @@ static int adpd188bi_init(const struct device *dev){
         return -EIO;
     }
 #if CONFIG_ADPD188_TRIGGER
-    if (config->int_gpio.port) {
+    if(config->int_gpio.port) {
 
         return adpd188bi_interrupt_init(dev);
     }
 #endif
+
+    //Start Normal Mode operation : Enter Normal Sampling Mode (Register 0x10 = 0x0002) to begin operation.
+    if(adpd188_mode_set(data->adpd_dev, ADPD188_NORMAL) != 0) {
+
+	LOG_ERR("Failed to set the device in Normal Mode");
+	return -EIO;
+    }
     return 0;
 }
 
@@ -500,7 +576,7 @@ static int adpd188bi_trigger_set(const struct device *dev,
     const struct adpd188bi_config *config = dev->config;
     struct adpd188bi_data *data = dev->data;
     if(trig->type != SENSOR_TRIG_DATA_READY || 
-	(enum adpd188bi_channel)(trig->chan) != ADPD188_CHAN_ALL || 
+	(trig->chan) != SENSOR_CHAN_VOC || 
 	config->int_gpio.port == NULL) {
 
 	return -ENOTSUP;

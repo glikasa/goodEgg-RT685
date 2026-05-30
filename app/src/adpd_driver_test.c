@@ -1,31 +1,30 @@
 
 #include <stdio.h>
-#include <zephyr/kernel.h>
 #include <zephyr/device.h>
+#include <zephyr/drivers/adpd188bi.h>
 #include <zephyr/drivers/sensor.h>
-#include <zephyr/sys/util_macro.h>
 #include <zephyr/kernel.h>
 #include <zephyr/rtio/rtio.h>
-#include <zephyr/drivers/adpd188bi.h>
+#include <zephyr/sys/util_macro.h>
 
+void on_data_ready(const struct device *dev,
+                   const struct sensor_trigger *trigger) {
 
-void on_data_ready(const struct device *dev, const struct sensor_trigger *trigger) {
+  struct sensor_value smoke;
+  if (sensor_channel_get(dev, SENSOR_CHAN_VOC, &smoke) < 0) {
 
-    struct sensor_value smoke;
-    if(sensor_channel_get(dev, SENSOR_CHAN_VOC, &smoke) < 0) {
-
-	printk("%s: Failed to get smoke data \n", dev->name);
-	return;
-    }
-    printk("%16s : Blue data: %d   IR data: %d\n", dev->name, smoke.val1, smoke.val2);
+    printk("%s: Failed to get smoke data \n", dev->name);
+    return;
+  }
+  printk("%16s : Blue data: %d   IR data: %d\n", dev->name, smoke.val1,
+         smoke.val2);
 }
-
 
 int main(void) {
 
-    int ret;
-    const struct device *const dev = DEVICE_DT_GET(DT_ALIAS(adpd0));
-    if(!device_is_ready(dev)) {
+  int ret;
+  const struct device *const dev = DEVICE_DT_GET(DT_ALIAS(adpd0));
+  if (!device_is_ready(dev)) {
 
 	printk("sensor: device %s not ready.\n", dev->name);
 	return -EIO;
