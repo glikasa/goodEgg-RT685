@@ -70,6 +70,22 @@
 			drive-open-drain;
 		};
 	};
+
+	pinmux_flexcomm3_usart: pinmux_flexcomm3_usart {
+		group0 {
+			pinmux = <FC3_RXD_SDA_MOSI_DATA_PIO0_23>;
+			input-enable;
+			slew-rate = "normal";
+			drive-strength = "normal";
+		};
+
+		group1 {
+			pinmux = <FC3_TXD_SCL_MISO_WS_PIO0_22>;
+			slew-rate = "normal";
+			drive-strength = "normal";
+		};
+	};
+
 	pinmux_flexcomm4_usart: pinmux_flexcomm4_usart {
 		group0 {
 			pinmux = <FC4_RXD_SDA_MOSI_DATA_PIO0_30>;

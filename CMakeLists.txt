@@ -8,5 +8,5 @@ list(APPEND ZEPHYR_EXTRA_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/modules/esp_hosted
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(goodEgg-RT685)
 
-target_sources(app PRIVATE app/src/esp_hosted_test.c)
+target_sources(app PRIVATE app/src/mqtt_over_lte_test.c app/src/mqtt_manager.c)
 

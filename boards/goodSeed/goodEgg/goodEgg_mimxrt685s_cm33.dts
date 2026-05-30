@@ -49,6 +49,7 @@
 
 		//bme6xx = &bme680;
 		//die-temp0 = &adc_temp;
+		modem = &modem;
 	};
 
 	chosen {
@@ -271,6 +272,22 @@
 	dma-names = "rx", "tx";
 };
 
+&flexcomm3 {
+	compatible = "nxp,lpc-usart";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm3_usart>;
+	pinctrl-names = "default";
+	dmas = <&dma0 10>, <&dma0 11>;
+	dma-names = "rx", "tx";
+
+	modem: modem {
+		compatible = "quectel,bg9x";
+		mdm-power-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+		mdm-reset-gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+};
 
 &flexcomm4 {
 	compatible = "nxp,lpc-usart";
@@ -281,6 +298,7 @@
 	dmas = <&dma0 8>, <&dma0 9>;
 	dma-names = "rx", "tx";
 };
+
 
 /* &flexcomm4 { */
 /* 	compatible = "nxp,lpc-spi"; */
@@ -566,7 +584,7 @@ i2s0: &flexcomm7 {
 	#size-cells = <0>;
 	esp32: esp32@1 {
 
-		status = "okay";
+		status = "disabled";
 		compatible = "espressif,esp-hosted-sdio";
 		reg = <1>;
 		//reset-gpios = <&gpio1 9 GPIO_ACTIVE_HIGH>;
