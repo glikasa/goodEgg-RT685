@@ -1,0 +1,25 @@
+
+menuconfig CD4066B
+	bool "CD4066B CMOS Quad Bilateral Switch driver"
+	default y
+	depends on DT_HAS_TI_CD4066B_ENABLED
+	depends on GPIO
+	help
+	  Enable driver for TI CD4066B CMOS Quad Bilateral Switch.
+
+if CD4066B
+
+config CD4066B_INIT_PRIORITY
+	int "CD4066B init priority"
+	default 80
+	help
+	  Device driver initialization priority.
+
+config CD4066B_LOG_LEVEL
+	int "CD4066B log level"
+	default 3
+	range 0 4
+	help
+	  Log level for CD4066B driver (0=OFF, 1=ERR, 2=WRN, 3=INF, 4=DBG)
+
+endif # CD4066B

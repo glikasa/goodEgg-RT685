@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_CD4066B cd4066b)
